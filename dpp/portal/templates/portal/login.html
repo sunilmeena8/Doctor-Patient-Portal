@@ -1,0 +1,9 @@
+{% extends "portal/header.html" %}
+{% block content %}
+  <h1>LogIn</h1>
+  <form method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <button type="submit">LogIn</button>
+  </form>
+{% endblock %}
