@@ -31,7 +31,7 @@ def register(request):
 				patient.save()
 			user=authenticate(username=username,password=password)
 			login(request,user)
-			return render(request,'portal/home.html',)
+			return render(request,'portal/home.html',{'person':person})
 		else:
 			pass
 	else:
@@ -46,7 +46,14 @@ def login_req(request):
 			password=form.cleaned_data.get('password')
 			user= authenticate(username=username,password=password)
 			login(request,user)
-			return render(request,'portal/home.html')
+			person=Person()
+			for i in Person.objects.all():
+				if(i.name==username):
+					person=i
+					break
+			return render(request,'portal/home.html',{'person':person})
+			
+			
 	else:
 		form=AuthenticationForm()
 	return render(request,'portal/login.html',{'form':form})

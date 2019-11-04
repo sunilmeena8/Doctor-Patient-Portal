@@ -2,6 +2,15 @@
 
 {% block content %}
 <body>
-      <h1> Hi there</h1>   
+	{{person.name}}
+	{% if user.is_authenticated %}
+		<h1> Hi there</h1>  
+		<p>I am a {{person.occupation}}.</p> 
+    	{% if person.occupation == "doctor" %}
+			<H3>Appoitments: </h3>
+		{% else %}
+			<a href="/search">Search for doctor</a>
+		{% endif %}
+	{% endif %}
 </body>
 {% endblock %}
