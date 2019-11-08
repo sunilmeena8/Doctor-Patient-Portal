@@ -2,10 +2,13 @@
 
 {% block dsearch %}
 	{% for doctor in doctor_list %}
-		<p>{{doctor.1}}</p>
+		<p><a href="/appoint/{{doctor.1}}">{{doctor.1}}</a></p>
 	{% endfor %}
+	<div id="container">
 	<form>
-		Enter name: <input type='text' name="doctor_name">
-		<button type="submit">Submit</button>
-	</form> 
+		{% csrf_token %}
+		{{form.doctor}}
+		<button type="submit" value="Submit">
+	</form>
+	</div>
 {% endblock %}

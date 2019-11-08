@@ -9,8 +9,16 @@
 		<p>I am a {{person.2}}.</p> 
     	{% if person.2 == "doctor" %}
 			<H3>Appoitments: </h3>
+			{% for appointment in appointments %}
+				<h5>{{appointment}}</h5>
+			{% endfor %}
 		{% else %}
+			<H3>Appoitments: </h3>
+			{% for appointment in appointments %}
+				<h5>{{appointment}}</h5>
+			{% endfor %}
 			<a href="/searchfordoctor">Search for doctor</a>
+
 		{% endif %}
 	{% endif %}
 </body>

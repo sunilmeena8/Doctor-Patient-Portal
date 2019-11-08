@@ -1,6 +1,7 @@
 {% extends "portal/header.html" %}
 {% block content %}
   <h1>Sign Up</h1>
+  {{error}}
   <form method="POST">
     {% csrf_token %}
     {{form.as_p}}
