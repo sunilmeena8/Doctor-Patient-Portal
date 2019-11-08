@@ -13,3 +13,9 @@ class Doctor(models.Model):
 class Patient(models.Model):
 	id=models.IntegerField(primary_key=True)
 	name=models.CharField(max_length=20)
+
+class Appointment(models.Model):
+	id=models.IntegerField(primary_key=True)
+	did=models.IntegerField()
+	pid=models.IntegerField()
+	

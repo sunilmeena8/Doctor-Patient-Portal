@@ -1,0 +1,11 @@
+{% extends 'portal/header.html' %}
+
+{% block dsearch %}
+	{% for doctor in doctor_list %}
+		<p>{{doctor.1}}</p>
+	{% endfor %}
+	<form>
+		Enter name: <input type='text' name="doctor_name">
+		<button type="submit">Submit</button>
+	</form> 
+{% endblock %}

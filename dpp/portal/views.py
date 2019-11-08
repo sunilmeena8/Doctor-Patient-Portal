@@ -1,20 +1,20 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from .forms import CustomForm
 from .models import Person, Patient, Doctor
+from django.db import connection
 # Create your views here.
 
 
 def homeview(request):
     user=request.user
     if(user.is_authenticated and not (user.is_staff) ):
-        for i in Person.objects.all():
-            print(i.name)
-            if(i.name==user.username):
-                person=i
+        cursor=connection.cursor()
+        cursor.execute('select * from portal_person WHERE name= %s',[user.username])
+        person=cursor.fetchone()
         return render(request, 'portal/home.html', {'person':person})
     return render(request,'portal/home.html',{})
 
@@ -27,21 +27,18 @@ def register(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password1')
             occupation = form.cleaned_data.get('occupation')
-            person = Person()
-            person.name = username
-            person.occupation = occupation
-            person.save()
+            cursor=connection.cursor()
+            cursor.execute('INSERT INTO portal_person (name,occupation) values (%s,%s)',[username,occupation])
             if(occupation == 'doctor'):
-                doctor = Doctor()
-                doctor.name = username
-                doctor.save()
-
+                cursor=connection.cursor()
+                cursor.execute('INSERT INTO portal_doctor ("name") values (%s)',[username])
             else:
-                patient = Patient()
-                patient.name = username
-                patient.save()
+                cursor=connection.cursor()
+                cursor.execute('INSERT INTO portal_patient ("name") values (%s)',[username])
             user = authenticate(username=username, password=password)
             login(request, user)
+            cursor.execute('select * from portal_person where name= %s',[username])
+            person=cursor.fetchone()
             return render(request, 'portal/home.html', {'person': person})
         else:
             pass
@@ -58,11 +55,12 @@ def login_req(request):
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
             login(request, user)
-            person = Person()
-            for i in Person.objects.all():
-                if(i.name == username):
-                    person = i
-                    break
+            
+            
+            cursor=connection.cursor()
+            cursor.execute('select * from portal_person WHERE name= %s',[username])
+            person=cursor.fetchone()
+            # print(person)
             return render(request, 'portal/home.html', {'person': person})
 
     else:
@@ -72,4 +70,12 @@ def login_req(request):
 
 def logout_req(request):
     logout(request)
-    return render(request, "portal/home.html")
+    return redirect('homepage')
+
+def doctor_search(request):
+    #doctors=Doctor.objects.raw('select * from portal_doctor')
+    cursor=connection.cursor()
+    cursor.execute('select * from portal_doctor')
+    doctors=cursor.fetchall()
+    # print(doctors)
+    return render(request,'portal/searchdoctor.html',{'doctor_list':doctors})
