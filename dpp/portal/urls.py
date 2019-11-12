@@ -22,7 +22,8 @@ urlpatterns = [
     path('register/',views.register),
     path('login/',views.login_req),
     path('logout/',views.logout_req),
-    path('searchfordoctor/',views.doctor_search),
+    path('searchfordoctor/',views.doctor_search,name='searchfordoctor'),
     path('editprofile',views.profileedit),
+    path('selectdoctor/',views.addapointment)
     
 ]

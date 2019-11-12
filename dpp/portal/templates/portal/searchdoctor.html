@@ -2,7 +2,7 @@
 
 {% block dsearch %}
 	{% for doctor in doctor_list %}
-		<p><a href="/appoint/{{doctor.1}}">{{doctor.1}}</a></p>
+		<p><a href="/selectdoctor/?id={{doctor.0}}">{{doctor.1}}</a></p>
 	{% endfor %}
 	
 {% endblock %}

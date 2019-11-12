@@ -14,7 +14,7 @@ def homeview(request):
     user=request.user
     if(user.is_authenticated and not (user.is_staff) ):
         cursor=connection.cursor()
-        cursor.execute('select * from portal_person WHERE username= %s',[user.username])
+        cursor.execute('select * from portal_person WHERE username_id= %s',[user.id])
         person=cursor.fetchone()
         return render(request, 'portal/home.html', {'person':person})
     return render(request,'portal/home.html',{})
@@ -31,7 +31,9 @@ def register(request):
             username=form.cleaned_data.get('username')
             password=form.cleaned_data.get('password1')
             messages.success(request, f"New account created: {username}")
-            cursor.execute('INSERT INTO portal_person (username,email,occupation) values (%s,%s,%s)',[username,email,occupation])
+            cursor.execute('Select id from auth_user where username=%s',[username])
+            userid = cursor.fetchone()
+            cursor.execute('INSERT INTO portal_person (username_id,email,occupation) values (%s,%s,%s)',[userid[0],email,occupation])
             if(occupation == 'doctor'):
                 cursor=connection.cursor()
                 cursor.execute('INSERT INTO portal_doctor (username,email) values (%s,%s)',[username,email])
@@ -41,7 +43,7 @@ def register(request):
             user=authenticate(username=username,password=password)
             login(request, user)
             messages.info(request, f"You are now logged in as {username}")
-            cursor.execute('select * from portal_person where username= %s',[username])
+            cursor.execute('select * from portal_person where username_id= %s',[user.id])
             person=cursor.fetchone()
             return redirect('homepage')
         else:
@@ -67,7 +69,7 @@ def login_req(request):
                 login(request, user)
                 messages.info(request, f"You are now logged in as {username}")
                 cursor=connection.cursor()
-                cursor.execute('select * from portal_person WHERE username= %s',[username])
+                cursor.execute('select * from portal_person WHERE username_id= %s',[user.id])
                 person=cursor.fetchone()
                 print(person)
                 if(person[2]=="doctor"):
@@ -92,13 +94,13 @@ def logout_req(request):
 
 def doctor_search(request):
     #doctors=Doctor.objects.raw('select * from portal_doctor')
-    form=DoctorSelectForm
+    
     
     cursor=connection.cursor()
     cursor.execute('select * from portal_doctor')
     doctors=cursor.fetchall()
     print(doctors)
-    return render(request,'portal/searchdoctor.html',{'doctor_list':doctors,'form':form})
+    return render(request,'portal/searchdoctor.html',{'doctor_list':doctors})
 
 def appoint(request,doctor):
     print(doctor)
@@ -124,7 +126,7 @@ def profileedit(request):
                     tslots.append(0)
             print(tslots)
             cursor=connection.cursor()
-            person=get_person_details(user.username)
+            person=get_person_details(user.id)
             cursor.execute('update portal_doctor set specialization= %s,name= %s,address=%s,phone_number=%s where username=%s',[specialization,name,address,phone_number,user.username])
             cursor.execute('update portal_freetimings set t0_1=%s,t1_2=%s,t2_3=%s,t3_4=%s,t4_5=%s,t5_6=%s,t6_7=%s,t7_8=%s,t8_9=%s,t9_10=%s,t10_11=%s,t11_12=%s,t12_13=%s,t13_14=%s,t14_15=%s,t15_16=%s,t16_17=%s,t17_18=%s,t18_19=%s,t19_20=%s,t20_21=%s,t21_22=%s,t22_23=%s,t23_24=%s where did=(select id from portal_doctor where username=%s)',[tslots[0],tslots[1],tslots[2],tslots[3],tslots[4],tslots[5],tslots[6],tslots[7],tslots[8],tslots[9],tslots[10],tslots[11],tslots[12],tslots[13],tslots[14],tslots[15],tslots[16],tslots[17],tslots[18],tslots[19],tslots[20],tslots[21],tslots[22],tslots[23],user.username])
             print(person)
@@ -135,8 +137,13 @@ def profileedit(request):
 
 def get_person_details(username):
     cursor=connection.cursor()
-    cursor.execute('select * from portal_person WHERE username= %s',[username])
+    cursor.execute('select * from portal_person WHERE username_id= %s',[username])
     person=cursor.fetchone()
     return(person)
+
+def addapointment(request):
+    id = request.GET.get('id')
+    print(id)
+    return redirect('homepage')
 
                 
