@@ -1,0 +1,43 @@
+header{
+	background-image: url("flywheel.jpg");
+	background-size: 1520px 1120px;
+	text-align: center;
+	font-size: 150%;
+	color: #ffffff;
+	padding: 15px 50px 25px 50px;
+}
+.nav{
+	display: inline-block;
+	width: 150px;
+	height: 40px;
+	text-decoration: none;
+	background: 	#F0F8FF;
+	margin: 15px 30px;
+	margin-bottom: 20px;
+	padding: 12px 12px;
+	padding-bottom:5px;
+	border-radius: 5px;
+	opacity: 0.4;
+	font-size: 30px;
+	color: #000000;
+}
+a:hover{
+	opacity: 1.0;
+	color: #0000ff;
+	background: #ffffff;
+}
+
+
+.tableclass{
+margin-left: 100px;}
+
+.timing_checkbox{
+	font-size: 100px;
+
+}
+div{
+	background: #0000ff;
+	text-align: center;
+	font-size: 30px;
+  
+} 

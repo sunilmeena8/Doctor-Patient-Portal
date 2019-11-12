@@ -1,0 +1,73 @@
+{% extends "portal/header.html" %}
+{% block content %}
+  <div class="editdoctor">
+  <h1>Edit details: </h1>
+  
+  <form   method="GET">
+    {% csrf_token %}
+    
+     
+    <table  class="tableclass" style="align:center;margin-left:400px">
+      <tr style="text-align:left;">
+        <td>Name:
+        </td>
+        <td>{{form.name}}
+        </td>
+      </tr>
+      <tr >
+        <td style="text-align:left;padding-top:10px">Address:
+        </td>
+        <td style="text-align:left">{{form.address}}
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align:left;padding-top:10px">Phone no.
+        </td>
+        <td style="text-align:left">{{form.phone_number}}
+        </td>
+      </tr>
+       <tr>
+        <td style="text-align:left; vertical-align: top; padding-top:32px;">Specialization:
+        </td>
+        <td style="text-align:left;">
+            {% for sp in form.specialization %}
+            <br>{{sp}}
+            {% endfor %}
+        </td>
+      </tr>
+       <tr>
+        <td style="text-align:left; vertical-align: top; padding-top:32px;">Free Slots:
+        </td>
+        <td class="timing_checkbox">
+          0-1 {{form.t0}}
+          1-2 {{form.t1}}
+          2-3 {{form.t2}}
+          3-4 {{form.t3}}
+          4-5 {{form.t4}}
+          5-6 {{form.t5}} 
+          6-7 {{form.t6}}
+          7-8 {{form.t7}}
+          8-9 {{form.t8}}
+          9-10 {{form.t9}}
+          10-11 {{form.t10}}
+          11-12 {{form.t11}}
+          12-13 {{form.t12}}  
+          13-14 {{form.t13}}
+          14-15 {{form.t14}} 
+          15-16{{form.t15}}
+          16-17 {{form.t16}}
+          17-18 {{form.t17}}  
+          18-19 {{form.t18}}  
+          19-20 {{form.t19}}    
+          20-21 {{form.t20}}
+          21-22 {{form.t21}}
+          22-23 {{form.t22}}
+          23-24 {{form.t23}}
+        </td>    
+      </tr>
+    </table>
+    <br>
+    <button type="submit">Save</button>
+  </form>
+  </div>
+{% endblock %}

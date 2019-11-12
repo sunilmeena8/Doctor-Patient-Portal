@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
-from .forms import CustomForm,DoctorSelectForm
+from .forms import CustomForm,DoctorProfileForm
 from .models import Person, Patient, Doctor
 from django.db import connection
 from django.contrib import messages
@@ -14,7 +14,7 @@ def homeview(request):
     user=request.user
     if(user.is_authenticated and not (user.is_staff) ):
         cursor=connection.cursor()
-        cursor.execute('select * from portal_person WHERE name= %s',[user.username])
+        cursor.execute('select * from portal_person WHERE username= %s',[user.username])
         person=cursor.fetchone()
         return render(request, 'portal/home.html', {'person':person})
     return render(request,'portal/home.html',{})
@@ -24,29 +24,26 @@ def register(request):
     if(request.method == 'POST'):
         form = CustomForm(request.POST)
         if(form.is_valid()):
-            '''cursor=connection.cursor()
-            cursor.execute('select * from auth_user where username= %s',[form.cleaned_data.get('username')])
-            aluser=cursor.fetchone()
-            print(aluser)
-            if(len(aluser)>=1):
-                messages.error(request,"Username already taken.")'''
-            user=form.sav()
-            username = user.username
-            occupation = user.occupation
+            cursor=connection.cursor()
+            form.save()
+            occupation=form.cleaned_data.get('occupation')
+            email=form.cleaned_data.get('email')
+            username=form.cleaned_data.get('username')
+            password=form.cleaned_data.get('password1')
             messages.success(request, f"New account created: {username}")
-            cursor.execute('INSERT INTO portal_person (name,occupation) values (%s,%s)',[username,occupation])
+            cursor.execute('INSERT INTO portal_person (username,email,occupation) values (%s,%s,%s)',[username,email,occupation])
             if(occupation == 'doctor'):
                 cursor=connection.cursor()
-                cursor.execute('INSERT INTO portal_doctor ("name") values (%s)',[username])
+                cursor.execute('INSERT INTO portal_doctor (username,email) values (%s,%s)',[username,email])
             else:
                 cursor=connection.cursor()
-                cursor.execute('INSERT INTO portal_patient ("name") values (%s)',[username])
-            #user=authenticate(username=username,password=password)
+                cursor.execute('INSERT INTO portal_patient (username,email) values (%s,%s)',[username,email])
+            user=authenticate(username=username,password=password)
             login(request, user)
             messages.info(request, f"You are now logged in as {username}")
-            cursor.execute('select * from portal_person where name= %s',[username])
+            cursor.execute('select * from portal_person where username= %s',[username])
             person=cursor.fetchone()
-            return render(request, 'portal/home.html', {'person': person})
+            return redirect('homepage')
         else:
             for msg in form.error_messages:
                 messages.error(request, f"{msg}: {form.error_messages[msg]}")
@@ -70,15 +67,15 @@ def login_req(request):
                 login(request, user)
                 messages.info(request, f"You are now logged in as {username}")
                 cursor=connection.cursor()
-                cursor.execute('select * from portal_person WHERE name= %s',[username])
+                cursor.execute('select * from portal_person WHERE username= %s',[username])
                 person=cursor.fetchone()
                 print(person)
                 if(person[2]=="doctor"):
-                    cursor.execute('select * from portal_appointment a where a.did in (select id from portal_doctor where name= %s )',[username])
+                    cursor.execute('select * from portal_appointment a where a.did in (select id from portal_doctor where username= %s )',[username])
                 else:
-                    cursor.execute('select * from portal_appointment a where a.pid in (select id from portal_patient where name= %s )',[username])
+                    cursor.execute('select * from portal_appointment a where a.pid in (select id from portal_patient where username= %s )',[username])
                 appointments=cursor.fetchall()
-                return render(request, 'portal/home.html', {'person': person,'appointments':appointments})
+                return redirect('homepage')
             else:
                 messages.error(request,"Invalid username or password.")
         else:
@@ -100,9 +97,46 @@ def doctor_search(request):
     cursor=connection.cursor()
     cursor.execute('select * from portal_doctor')
     doctors=cursor.fetchall()
-    # print(doctors)
+    print(doctors)
     return render(request,'portal/searchdoctor.html',{'doctor_list':doctors,'form':form})
 
 def appoint(request,doctor):
     print(doctor)
     return HttpResponse(request,"Hi")
+
+def profileedit(request):
+    
+    if(request.method=="GET"):
+        form=DoctorProfileForm(request.GET)
+        if(form.is_valid()):
+            user=request.user
+            specialization=request.GET.get('specialization')
+            name=request.GET.get('name')
+            address=request.GET.get('address')
+            phone_number=request.GET.get('phone_number')
+            tslots=[]
+            for i in range(24):
+                t='t'+str(i)
+                ch=request.GET.get(t)
+                if(ch=="on"):
+                    tslots.append(1)
+                else:
+                    tslots.append(0)
+            print(tslots)
+            cursor=connection.cursor()
+            person=get_person_details(user.username)
+            cursor.execute('update portal_doctor set specialization= %s,name= %s,address=%s,phone_number=%s where username=%s',[specialization,name,address,phone_number,user.username])
+            cursor.execute('update portal_freetimings set t0_1=%s,t1_2=%s,t2_3=%s,t3_4=%s,t4_5=%s,t5_6=%s,t6_7=%s,t7_8=%s,t8_9=%s,t9_10=%s,t10_11=%s,t11_12=%s,t12_13=%s,t13_14=%s,t14_15=%s,t15_16=%s,t16_17=%s,t17_18=%s,t18_19=%s,t19_20=%s,t20_21=%s,t21_22=%s,t22_23=%s,t23_24=%s where did=(select id from portal_doctor where username=%s)',[tslots[0],tslots[1],tslots[2],tslots[3],tslots[4],tslots[5],tslots[6],tslots[7],tslots[8],tslots[9],tslots[10],tslots[11],tslots[12],tslots[13],tslots[14],tslots[15],tslots[16],tslots[17],tslots[18],tslots[19],tslots[20],tslots[21],tslots[22],tslots[23],user.username])
+            print(person)
+            return redirect('homepage')
+    else:
+        form=DoctorProfileForm()
+    return render(request,"portal/editdoctorprofile.html",{'form':form})
+
+def get_person_details(username):
+    cursor=connection.cursor()
+    cursor.execute('select * from portal_person WHERE username= %s',[username])
+    person=cursor.fetchone()
+    return(person)
+
+                

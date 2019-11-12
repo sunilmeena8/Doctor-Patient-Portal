@@ -4,11 +4,5 @@
 	{% for doctor in doctor_list %}
 		<p><a href="/appoint/{{doctor.1}}">{{doctor.1}}</a></p>
 	{% endfor %}
-	<div id="container">
-	<form>
-		{% csrf_token %}
-		{{form.doctor}}
-		<button type="submit" value="Submit">
-	</form>
-	</div>
+	
 {% endblock %}

@@ -3,15 +3,14 @@
 {% block content %}
 <body>
 	
-	{{person.1}}
-	{% if user.is_authenticated %}
-		<h1> Hi there</h1>  
-		<p>I am a {{person.2}}.</p> 
-    	{% if person.2 == "doctor" %}
+	{% if user.is_authenticated %}	  
+    	{% if person.1 == "doctor" %}
 			<H3>Appoitments: </h3>
+			<Button><a href="/editprofile">EDIT PROFILE</a></Button>
 			{% for appointment in appointments %}
 				<h5>{{appointment}}</h5>
 			{% endfor %}
+
 		{% else %}
 			<H3>Appoitments: </h3>
 			{% for appointment in appointments %}
