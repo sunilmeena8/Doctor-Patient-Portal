@@ -26,13 +26,13 @@ class Patient(models.Model):
 	address=models.CharField(max_length=100,null=True)
 
 class Appointment(models.Model):
-	id=models.IntegerField(primary_key=True)
-	did=models.IntegerField()
-	pid=models.IntegerField()
+	
+	did=models.ForeignKey(Doctor,on_delete=models.CASCADE)
+	pid=models.ForeignKey(Patient,on_delete=models.CASCADE)
 	
 class FreeTimings(models.Model):
-	id=models.IntegerField(primary_key=True)
-	did=models.IntegerField()
+	
+	did=models.ForeignKey(Doctor,on_delete=models.CASCADE)
 	t0_1=models.BooleanField()
 	t1_2=models.BooleanField()
 	t2_3=models.BooleanField()
