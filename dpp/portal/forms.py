@@ -41,6 +41,11 @@ class DoctorProfileForm(forms.Form):
 	t22=forms.BooleanField(required=False)
 	t23=forms.BooleanField(required=False)
 	
+class PatientProfileForm(forms.Form):
+	name=forms.CharField(max_length=30)
+	phone_number=forms.CharField(max_length=50)
+	address=forms.CharField(max_length=100)
+
 class SearchDoctorForm(forms.Form):	
 	Choices=[('heart','heart'),('eye','eye'),('brain','brain'),('lungs','lungs'),('other','other')]
 	specialization=forms.ChoiceField(choices=Choices, widget=forms.RadioSelect)

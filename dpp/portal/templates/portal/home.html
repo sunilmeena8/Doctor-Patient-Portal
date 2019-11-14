@@ -6,7 +6,7 @@
 	{% if user.is_authenticated %}	  
     	{% if person.2 == "doctor" %}
 			<H3>Appoitments: </h3>
-			<Button><a href="/editprofile">EDIT PROFILE</a></Button>
+			<Button><a href="/editprofiledoctor">EDIT PROFILE</a></Button>
 			{% for appointment in appointments %}
 				<h5>{{appointment}}</h5>
 			{% endfor %}
@@ -17,6 +17,7 @@
 				<h5>{{appointment}}</h5>
 			{% endfor %}
 			<a href="/searchfordoctor">Search for doctor</a>
+			<Button><a href="/editprofilepatient">EDIT PROFILE</a></Button>
 
 		{% endif %}
 	{% endif %}

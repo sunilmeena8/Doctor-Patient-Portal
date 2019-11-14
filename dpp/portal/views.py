@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
-from .forms import CustomForm,DoctorProfileForm,SearchDoctorForm
+from .forms import CustomForm,DoctorProfileForm,SearchDoctorForm,PatientProfileForm
 from .models import Person, Patient, Doctor
 from django.db import connection
 from django.contrib import messages
@@ -16,7 +16,7 @@ def homeview(request):
         cursor.execute('select * from portal_person WHERE user_id= %s',[user.id])
         person=cursor.fetchone()
         # cursor.execute('select * from portal_appointment where 
-        print(person)
+        #print(person)
         return render(request, 'portal/home.html', {'person':person})
     return render(request,'portal/home.html',{})
 
@@ -112,7 +112,7 @@ def doctor_search(request):
 
     return render(request,'portal/searchdoctor.html',{'form':form})
 
-def profileedit(request):
+def profileeditdoctor(request):
     
     if(request.method=="GET"):
         form=DoctorProfileForm(request.GET)
@@ -140,6 +140,24 @@ def profileedit(request):
     else:
         form=DoctorProfileForm()
     return render(request,"portal/editdoctorprofile.html",{'form':form})
+
+def profileeditpatient(request):
+    
+    if(request.method=="GET"):
+        form=PatientProfileForm(request.GET)
+        if(form.is_valid()):
+            user=request.user
+            name=request.GET.get('name')
+            address=request.GET.get('address')
+            phone_number=request.GET.get('phone_number')
+            cursor=connection.cursor()
+            person=get_person_details(user.id)
+            cursor.execute('update portal_patient set name= %s,address=%s,phone_number=%s where username=%s',[name,address,phone_number,user.username])
+            print(person)
+            return redirect('homepage')
+    else:
+        form=PatientProfileForm()
+    return render(request,"portal/editpatientprofile.html",{'form':form})
 
 def get_person_details(username):
     cursor=connection.cursor()

@@ -23,7 +23,8 @@ urlpatterns = [
     path('login/',views.login_req),
     path('logout/',views.logout_req),
     path('searchfordoctor/',views.doctor_search,name='searchfordoctor'),
-    path('editprofile',views.profileedit),
-    path('selectdoctor/',views.addapointment)
+    path('editprofiledoctor/',views.profileeditdoctor),
+    path('selectdoctor/',views.addapointment),
+    path('editprofilepatient',views.profileeditpatient),
     
 ]
