@@ -11,14 +11,6 @@ class CustomForm(UserCreationForm):
 
 class DoctorProfileForm(forms.Form):
 	Choices=[('heart','heart'),('eye','eye'),('brain','brain'),('lungs','lungs'),('other','other')]
-	# choices_slots=[0 for i in range(24)]
-	# i=0
-	# for i in range(0,24):
-	# 	choices_slots[i]=forms.BooleanField()
-	DISPLAY_CHOICES = (
-    ("locationbox", "Display Location"),
-    ("displaybox", "Display Direction")
-	)
 
 	specialization=forms.ChoiceField(choices=Choices, widget=forms.RadioSelect)
 	name=forms.CharField(max_length=50)
@@ -49,5 +41,8 @@ class DoctorProfileForm(forms.Form):
 	t22=forms.BooleanField(required=False)
 	t23=forms.BooleanField(required=False)
 	
+class SearchDoctorForm(forms.Form):	
+	Choices=[('heart','heart'),('eye','eye'),('brain','brain'),('lungs','lungs'),('other','other')]
+	specialization=forms.ChoiceField(choices=Choices, widget=forms.RadioSelect)
 	
-
+	

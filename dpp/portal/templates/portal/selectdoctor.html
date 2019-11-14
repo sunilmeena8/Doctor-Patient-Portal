@@ -1,0 +1,18 @@
+{% extends 'portal/header.html' %}
+
+{% block dsearch %}
+	<h6>{{numdoctors}} doctors found.</h6>
+	{% for doctor in doctor_list %}
+		<p>{{doctor.1}}<br>Free Timings:<br></p>
+		{% for i in range %}
+			{% load index %}
+			{% with j=i|add:"10" %}
+			
+			{% if doctor|index:j == True %}
+			
+			<p><a href="/selectdoctor/?id={{doctor.0}}-{{i}}">{{i}}-{{i|add:"1"}}</a>
+			{% endif %}
+			{% endwith %}
+		{% endfor %}
+	{% endfor %}
+{% endblock %}

@@ -1,7 +1,11 @@
 {% extends 'portal/header.html' %}
 
 {% block dsearch %}
-	{% for doctor in doctor_list %}
-		<p><a href="/selectdoctor/?id={{doctor.0}}">{{doctor.1}}</a></p>
-	{% endfor %}
+	<form method="GET">
+		
+		{% for sp in form.specialization %}
+            <br>{{sp}}
+        {% endfor %}
+		<button type="submit">Search</button>
+	</form>
 {% endblock %}

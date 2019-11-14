@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
-from .forms import CustomForm,DoctorProfileForm
+from .forms import CustomForm,DoctorProfileForm,SearchDoctorForm
 from .models import Person, Patient, Doctor
 from django.db import connection
 from django.contrib import messages
@@ -15,10 +15,10 @@ def homeview(request):
         cursor=connection.cursor()
         cursor.execute('select * from portal_person WHERE user_id= %s',[user.id])
         person=cursor.fetchone()
+        # cursor.execute('select * from portal_appointment where 
         print(person)
         return render(request, 'portal/home.html', {'person':person})
     return render(request,'portal/home.html',{})
-
 
 def register(request):
     if(request.method == 'POST'):
@@ -92,19 +92,25 @@ def logout_req(request):
     messages.info(request, "Logged out successfully.")
     return redirect('homepage')
 
-def doctor_search(request):
-    #doctors=Doctor.objects.raw('select * from portal_doctor')
-    
-    
-    cursor=connection.cursor()
-    cursor.execute('select * from portal_doctor')
-    doctors=cursor.fetchall()
-    print(doctors)
-    return render(request,'portal/searchdoctor.html',{'doctor_list':doctors})
 
-def appoint(request,doctor):
-    print(doctor)
-    return HttpResponse(request,"Hi")
+def doctor_search(request):
+    
+    if(request.method=="GET"):
+        form=SearchDoctorForm(request.GET)
+        if(form.is_valid()):
+            user=request.user
+            specialization=request.GET.get('specialization')
+            cursor=connection.cursor()
+            cursor.execute('select * from portal_doctor d inner join portal_freetimings f on d.id=f.did_id where d.specialization=%s',[specialization])
+            doctors=cursor.fetchall()
+            if(len(doctors)==0):
+                numdoctors=0
+            else:
+                numdoctors=len(doctors)
+            print(numdoctors)
+            return render(request,'portal/selectdoctor.html',{'doctor_list':doctors,'range':range(24),'numdoctors':numdoctors})
+
+    return render(request,'portal/searchdoctor.html',{'form':form})
 
 def profileedit(request):
     
@@ -142,8 +148,18 @@ def get_person_details(username):
     return(person)
 
 def addapointment(request):
-    id = request.GET.get('id')
-    print(id)
+    user=request.user
+    x = request.GET.get('id')
+    did,tme=map(int,x.split("-"))
+    tme="t"+str(tme)+"_"+str(tme+1)
+    cursor=connection.cursor()
+    cursor.execute('select id from portal_patient where user_id=%s',[user.id])
+    pid=cursor.fetchone()
+    s='update portal_freetimings set '+tme+"=0 where did_id="+str(did)
+    cursor.execute(s)
+    cursor.execute('insert into portal_appointment (did_id,pid_id) values (%s,%s)',[did,pid[0]])
+    messages.info(request, f"Appointment booked.")
+    #print(id)
     return redirect('homepage')
 
                 
