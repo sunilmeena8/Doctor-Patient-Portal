@@ -5,21 +5,63 @@
 	
 	{% if user.is_authenticated %}	  
     	{% if person.2 == "doctor" %}
-			<H3>Appoitments: </h3>
+			
 			<Button><a href="/editprofiledoctor">EDIT PROFILE</a></Button>
-			{% for appointment in appointments %}
-				<h5>{{appointment}}</h5>
-			{% endfor %}
-
-		{% else %}
 			<H3>Appoitments: </h3>
+			<table border=1 solid>
+			<tr>
+				<td>Sr. No.</td>
+				<td>Username</td>
+				<td>Doctor</td>
+				<td>Contact No.</td>
+				<td>Address</td>
+				<td>Time</td>
+			</tr>
 			{% for appointment in appointments %}
-				<h5>{{appointment}}</h5>
+				<tr>
+				<td>{{forloop.counter}}</td>
+				{% for det in appointment %}
+					<td style="padding:5px">
+					<p>{{det}}</p>
+					</td>
+				{% endfor %}
+				<td><a href="/cancelappointment/?id={{appointment.0}}-{{appointment.4}}" name="cncl">Cancel</a></td>
+				</tr>
 			{% endfor %}
-			<a href="/searchfordoctor">Search for doctor</a>
+			</table>
+			<Button> <a href="/appointmenthistory">Appointment History </a> </Button>
+		{% else %}
+			
+			<a href="/searchdoctor">Search for doctor</a>
 			<Button><a href="/editprofilepatient">EDIT PROFILE</a></Button>
-
+			<H3>Appoitments: </h3>
+			<table border=1 solid>
+			<tr>
+				<td>Sr. No.</td>
+				<td>Username</td>
+				<td>Patient</td>
+				<td>Contact No.</td>
+				<td>Address</td>
+				<td>Time</td>
+			</tr>
+			{% for appointment in appointments %}
+				<tr>
+				<td >{{forloop.counter}}</td>
+				{% for det in appointment %}
+					<td>
+					<p>{{det}}</p>
+					</td>
+				{% endfor %}
+				<td><a href="/cancelappointment/?id={{appointment.0}}-{{appointment.4}}" name="cncl">Cancel</a></td>
+				</tr>
+			{% endfor %}
+			</table>
+			<Button> <a href="/appointmenthistory">Appointment History </a> </Button>
 		{% endif %}
+	{% else %}
+		<h4>Welcome to the Doctor Patient Portal</h4>
+		<p><a href="/login">LogIn</a> or <a href="/register">Register</a> to continue.</p> 
 	{% endif %}
+
 </body>
 {% endblock %}

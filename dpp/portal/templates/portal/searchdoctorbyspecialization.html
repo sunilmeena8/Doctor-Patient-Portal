@@ -1,11 +1,12 @@
+
 {% extends 'portal/header.html' %}
 
 {% block dsearch %}
 	<form method="GET">
-		
 		{% for sp in form.specialization %}
             <br>{{sp}}
         {% endfor %}
+		<br>
 		<button type="submit">Search</button>
 	</form>
 {% endblock %}

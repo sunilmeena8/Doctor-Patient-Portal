@@ -29,6 +29,7 @@ class Appointment(models.Model):
 	
 	did=models.ForeignKey(Doctor,on_delete=models.CASCADE)
 	pid=models.ForeignKey(Patient,on_delete=models.CASCADE)
+	time=models.CharField(max_length=10)
 	
 class FreeTimings(models.Model):
 	
@@ -58,3 +59,7 @@ class FreeTimings(models.Model):
 	t22_23=models.BooleanField()
 	t23_24=models.BooleanField()
 
+class AppointmentHistory(models.Model):
+	did=models.ForeignKey(Doctor,on_delete=models.CASCADE)
+	pid=models.ForeignKey(Patient,on_delete=models.CASCADE)
+	time=models.CharField(max_length=10)

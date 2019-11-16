@@ -2,7 +2,8 @@ from django.contrib.auth.forms import  UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
 class CustomForm(UserCreationForm):
-	occupation=forms.CharField(max_length=20)
+	Choices=[('doctor','doctor'),('patient','patient')]
+	occupation=forms.ChoiceField(choices=Choices,widget=forms.RadioSelect)
 	email=forms.CharField(max_length=40)
 	class Meta:
 		model=User
@@ -46,8 +47,10 @@ class PatientProfileForm(forms.Form):
 	phone_number=forms.CharField(max_length=50)
 	address=forms.CharField(max_length=100)
 
-class SearchDoctorForm(forms.Form):	
+class SearchDoctorSpForm(forms.Form):	
 	Choices=[('heart','heart'),('eye','eye'),('brain','brain'),('lungs','lungs'),('other','other')]
 	specialization=forms.ChoiceField(choices=Choices, widget=forms.RadioSelect)
 	
+class SearchDoctorUnForm(forms.Form):
+	username=forms.CharField(max_length=50)
 	

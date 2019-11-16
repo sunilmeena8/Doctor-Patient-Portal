@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
-from .forms import CustomForm,DoctorProfileForm,SearchDoctorForm,PatientProfileForm
+from .forms import CustomForm,DoctorProfileForm,SearchDoctorSpForm,PatientProfileForm,SearchDoctorUnForm
 from .models import Person, Patient, Doctor
 from django.db import connection
 from django.contrib import messages
@@ -15,9 +15,12 @@ def homeview(request):
         cursor=connection.cursor()
         cursor.execute('select * from portal_person WHERE user_id= %s',[user.id])
         person=cursor.fetchone()
-        # cursor.execute('select * from portal_appointment where 
-        #print(person)
-        return render(request, 'portal/home.html', {'person':person})
+        if(person[2]=='doctor'):
+            cursor.execute('select p.username,p.name,p.phone_number,p.address,a.time from portal_patient p inner join portal_appointment a on p.id=a.pid_id where did_id= (select id from portal_doctor where username=%s)',[person[1]])    
+        else:
+            cursor.execute('select d.username,d.name,d.phone_number,d.address,a.time from portal_doctor d inner join portal_appointment a on d.id=a.did_id where pid_id= (select id from portal_patient where username=%s)',[person[1]])
+        appointments=cursor.fetchall()
+        return render(request, 'portal/home.html', {'person':person,'appointments':appointments})
     return render(request,'portal/home.html',{})
 
 def register(request):
@@ -35,17 +38,22 @@ def register(request):
             userid = cursor.fetchone()
             cursor.execute('INSERT INTO portal_person (user_id,username,email,occupation) values (%s,%s,%s,%s)',[userid[0],username,email,occupation])
             if(occupation == 'doctor'):
-                cursor=connection.cursor()
+                cursor=connection.cursor() 
                 cursor.execute('INSERT INTO portal_doctor (username,email,user_id) values (%s,%s,%s)',[username,email,userid[0]])
+                cursor.execute('select id from portal_doctor where username=%s',[username])
+                did=cursor.fetchone()[0]
+                tslots=[0 for i in range(24)]
+                cursor.execute('insert into portal_freetimings (did_id,t0_1,t1_2,t2_3,t3_4,t4_5,t5_6,t6_7,t7_8,t8_9,t9_10,t10_11,t11_12,t12_13,t13_14,t14_15,t15_16,t16_17,t17_18,t18_19,t19_20,t20_21,t21_22,t22_23,t23_24) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',[did,tslots[0],tslots[1],tslots[2],tslots[3],tslots[4],tslots[5],tslots[6],tslots[7],tslots[8],tslots[9],tslots[10],tslots[11],tslots[12],tslots[13],tslots[14],tslots[15],tslots[16],tslots[17],tslots[18],tslots[19],tslots[20],tslots[21],tslots[22],tslots[23]])
             else:
                 cursor=connection.cursor()
                 cursor.execute('INSERT INTO portal_patient (username,email,user_id) values (%s,%s,%s)',[username,email,userid[0]])
+
             user=authenticate(username=username,password=password)
             login(request, user)
             messages.info(request, f"You are now logged in as {username}")
             cursor.execute('select * from portal_person where user_id= %s',[user.id])
             person=cursor.fetchone()
-            return redirect('homepage')
+            return redirect('editdoctor')
         else:
             for msg in form.error_messages:
                 messages.error(request, f"{msg}: {form.error_messages[msg]}")
@@ -56,8 +64,6 @@ def register(request):
     else:
         form = CustomForm()
     return render(request, 'portal/register.html', {'form': form})
-
-
 def login_req(request):
     if(request.method == 'POST'):
         form = AuthenticationForm(request, data=request.POST)
@@ -71,12 +77,6 @@ def login_req(request):
                 cursor=connection.cursor()
                 cursor.execute('select * from portal_person WHERE user_id= %s',[user.id])
                 person=cursor.fetchone()
-                print(person)
-                if(person[2]=="doctor"):
-                    cursor.execute('select * from portal_appointment a where a.did_id in (select id from portal_doctor where username= %s )',[username])
-                else:
-                    cursor.execute('select * from portal_appointment a where a.pid_id in (select id from portal_patient where username= %s )',[username])
-                appointments=cursor.fetchall()
                 return redirect('homepage')
             else:
                 messages.error(request,"Invalid username or password.")
@@ -86,31 +86,48 @@ def login_req(request):
         form = AuthenticationForm()
     return render(request, 'portal/login.html', {'form': form})
 
-
 def logout_req(request):
     logout(request)
     messages.info(request, "Logged out successfully.")
     return redirect('homepage')
 
+def doctor_search_by(request):
+    return render(request,'portal/searchdoctorby.html')
 
-def doctor_search(request):
-    
+def doctor_search_by_specialization(request):
     if(request.method=="GET"):
-        form=SearchDoctorForm(request.GET)
+        form=SearchDoctorSpForm(request.GET)
         if(form.is_valid()):
             user=request.user
             specialization=request.GET.get('specialization')
             cursor=connection.cursor()
             cursor.execute('select * from portal_doctor d inner join portal_freetimings f on d.id=f.did_id where d.specialization=%s',[specialization])
             doctors=cursor.fetchall()
+            print(doctors)
             if(len(doctors)==0):
                 numdoctors=0
             else:
                 numdoctors=len(doctors)
-            print(numdoctors)
             return render(request,'portal/selectdoctor.html',{'doctor_list':doctors,'range':range(24),'numdoctors':numdoctors})
+    return render(request,'portal/searchdoctorbyspecialization.html',{'form':form})
+    
 
-    return render(request,'portal/searchdoctor.html',{'form':form})
+def doctor_search_by_username(request):
+    if(request.method=="GET"):
+        form=SearchDoctorUnForm(request.GET)
+        if(form.is_valid()):
+            user=request.user
+            username=request.GET.get('username')
+            cursor=connection.cursor()
+            cursor.execute('select * from portal_doctor d inner join portal_freetimings f on d.id=f.did_id where d.username=%s',[username])
+            doctors=cursor.fetchall()
+            print(doctors)
+            if(len(doctors)==0):
+                numdoctors=0
+            else:
+                numdoctors=len(doctors)
+            return render(request,'portal/selectdoctor.html',{'doctor_list':doctors,'range':range(24),'numdoctors':numdoctors})
+    return render(request,'portal/searchdoctorbyusername.html',{'form':form})
 
 def profileeditdoctor(request):
     
@@ -170,14 +187,49 @@ def addapointment(request):
     x = request.GET.get('id')
     did,tme=map(int,x.split("-"))
     tme="t"+str(tme)+"_"+str(tme+1)
+    print(tme)
     cursor=connection.cursor()
     cursor.execute('select id from portal_patient where user_id=%s',[user.id])
     pid=cursor.fetchone()
     s='update portal_freetimings set '+tme+"=0 where did_id="+str(did)
     cursor.execute(s)
-    cursor.execute('insert into portal_appointment (did_id,pid_id) values (%s,%s)',[did,pid[0]])
+    cursor.execute('insert into portal_appointment (did_id,pid_id,time) values (%s,%s,%s)',[did,pid[0],tme[1:]])
     messages.info(request, f"Appointment booked.")
     #print(id)
     return redirect('homepage')
 
-                
+def cancelAppointment(request):
+    user=request.user
+    x=request.GET.get('id')
+    uname,tme=x.split('-')
+    cursor=connection.cursor()
+    cursor.execute('select * from portal_person WHERE user_id= %s',[user.id])
+    person=cursor.fetchone()
+    if(person[2]=='doctor'):
+        s="delete from portal_appointment where did_id=(select id from portal_doctor where username= '" + user.username + "') and pid_id= (select id from portal_patient where username= '" + uname + "') and time= '"+ tme + "'"
+        cursor.execute(s)
+        s='update portal_freetimings set '+"t"+tme+"=0 where did_id=(select id from portal_doctor where username= '" + user.username + "')" 
+        cursor.execute(s)
+        s="insert into portal_appointmenthistory (did_id,pid_id,time) values ((select id from portal_doctor where username= '" + user.username + "'),(select id from portal_patient where username= '" + uname + "'), 't"+ tme + "')"
+        cursor.execute(s)
+    else:
+        s="delete from portal_appointment where pid_id=(select id from portal_patient where username= '" + user.username + "') and did_id= (select id from portal_doctor where username= '" + uname + "') and time= '"+ tme + "'"
+        cursor.execute(s)
+        s='update portal_freetimings set '+"t"+tme+"=0 where did_id=(select id from portal_doctor where username= '" + uname + "')" 
+        cursor.execute(s)
+        s="insert into portal_appointmenthistory (did_id,pid_id,time) values ((select id from portal_doctor where username= '" + uname + "'),(select id from portal_patient where username= '" + user.username + "'), 't"+ tme + "')"
+        cursor.execute(s)
+    messages.info(request,f'Appointment cancelled')
+    return redirect('homepage')
+
+def appointmenthistory(request):
+    user=request.user
+    cursor=connection.cursor()
+    cursor.execute('select * from portal_person WHERE user_id= %s',[user.id])
+    person=cursor.fetchone()
+    if(person[2]=='doctor'):
+        cursor.execute('select p.username,p.name,p.phone_number,p.address,a.time from portal_patient p inner join portal_appointmenthistory a on p.id=a.pid_id where did_id= (select id from portal_doctor where username=%s)',[person[1]])    
+    else:
+        cursor.execute('select d.username,d.name,d.phone_number,d.address,a.time from portal_doctor d inner join portal_appointmenthistory a on d.id=a.did_id where pid_id= (select id from portal_patient where username=%s)',[person[1]])
+    appointments=cursor.fetchall() 
+    return render(request,'portal/appointmenthistory.html',{'appointments':appointments})

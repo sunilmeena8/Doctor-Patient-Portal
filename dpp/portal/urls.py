@@ -22,9 +22,12 @@ urlpatterns = [
     path('register/',views.register),
     path('login/',views.login_req),
     path('logout/',views.logout_req),
-    path('searchfordoctor/',views.doctor_search,name='searchfordoctor'),
-    path('editprofiledoctor/',views.profileeditdoctor),
+    path('searchdoctor/searchbyspecialization/',views.doctor_search_by_specialization,name='searchfordoctor'),
+    path('searchdoctor/searchbyusername/',views.doctor_search_by_username),
+    path('searchdoctor/',views.doctor_search_by),
+    path('editprofiledoctor/',views.profileeditdoctor,name='editdoctor'),
     path('selectdoctor/',views.addapointment),
-    path('editprofilepatient',views.profileeditpatient),
-    
+    path('editprofilepatient/',views.profileeditpatient,name='editpatient'),
+    path('cancelappointment/',views.cancelAppointment),
+    path('appointmenthistory/',views.appointmenthistory),
 ]
