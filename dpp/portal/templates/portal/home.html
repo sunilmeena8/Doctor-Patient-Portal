@@ -1,8 +1,7 @@
 {% extends "portal/header.html" %}
 
 {% block content %}
-<body>
-	
+	<div id="homeview">
 	{% if user.is_authenticated %}	  
     	{% if person.2 == "doctor" %}
 			<Button><a href="/myaccount">My account</a></Button>
@@ -64,6 +63,6 @@
 		<h4>Welcome to the Doctor Patient Portal</h4>
 		<p><a href="/login">LogIn</a> or <a href="/register">Register</a> to continue.</p> 
 	{% endif %}
+	</div>
 
-</body>
 {% endblock %}

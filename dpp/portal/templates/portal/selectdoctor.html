@@ -7,9 +7,7 @@
 		{% for i in range %}
 			{% load index %}
 			{% with j=i|add:"9" %}
-			
 			{% if doctor|index:j == True %}
-			
 			<p><a href="/selectdoctor/?id={{doctor.0}}-{{i}}">{{i}}-{{i|add:"1"}}</a>
 			{% endif %}
 			{% endwith %}

@@ -52,9 +52,10 @@ def register(request):
             user=authenticate(username=username,password=password)
             login(request, user)
             messages.info(request, f"You are now logged in as {username}")
-            cursor.execute('select * from portal_person where user_id= %s',[user.id])
-            person=cursor.fetchone()
-            return redirect('editdoctor')
+            if(occupation=='doctor'):
+                return redirect('editdoctor')
+            else:
+                return redirect('editpatient')
         else:
             for msg in form.error_messages:
                 messages.error(request, f"{msg}: {form.error_messages[msg]}")
@@ -122,7 +123,7 @@ def doctor_search_by_username(request):
             cursor=connection.cursor()
             cursor.execute('select * from portal_doctor d inner join portal_freetimings f on d.id=f.did_id where d.username=%s',[username])
             doctors=cursor.fetchall()
-            print(doctors)
+            #print(doctors)
             if(len(doctors)==0):
                 numdoctors=0
             else:
@@ -151,7 +152,6 @@ def profileeditdoctor(request):
                     tslots.append(1)
                 else:
                     tslots.append(0)
-            print(tslots)
             cursor=connection.cursor()
             person=get_person_details(user.id)
             cursor.execute('update portal_doctor set specialization= %s,name= %s,address=%s,phone_number=%s where username=%s',[specialization,name,address,phone_number,user.username])
@@ -174,10 +174,7 @@ def profileeditpatient(request):
             name=request.GET.get('name')
             address=request.GET.get('address')
             phone_number=request.GET.get('phone_number')
-            
-            person=get_person_details(user.id)
             cursor.execute('update portal_patient set name= %s,address=%s,phone_number=%s where username=%s',[name,address,phone_number,user.username])
-            print(person)
             return redirect('homepage')
     else:
         form=PatientProfileForm()
@@ -262,7 +259,7 @@ def appointmenthistory(request):
     else:
         cursor.execute('select d.username,d.name,d.phone_number,d.address,a.time from portal_doctor d inner join portal_appointmenthistory a on d.id=a.did_id where pid_id= (select id from portal_patient where username=%s)',[person[1]])
     appointments=cursor.fetchall() 
-    return render(request,'portal/appointmenthistory.html',{'appointments':appointments})
+    return render(request,'portal/appointmenthistory.html',{'appointments':appointments,'person':person})
 
 def myaccount(request):
     user=request.user

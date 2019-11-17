@@ -1,7 +1,29 @@
 {% extends 'portal/header.html' %}
 {% block content %}
 	<H3>Past appoitments: </h3>
+		{% if person.2 == "doctor" %}
 			<table border=1 solid>
+			<tr>
+				<td>Sr. No.</td>
+				<td>Username</td>
+				<td>Patient</td>
+				<td>Contact No.</td>
+				<td>Address</td>
+				<td>Time</td>
+			</tr>
+			{% for appointment in appointments %}
+				<tr>
+				<td>{{forloop.counter}}</td>
+				{% for det in appointment %}
+					<td style="padding:5px">
+					<p>{{det}}</p>
+					</td>
+				{% endfor %}
+				</tr>
+			{% endfor %}
+			</table>
+		{% else %}
+		<table border=1 solid>
 			<tr>
 				<td>Sr. No.</td>
 				<td>Username</td>
@@ -21,5 +43,6 @@
 				</tr>
 			{% endfor %}
 			</table>
+		{% endif %}
 			
 {% endblock %}
