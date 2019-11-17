@@ -7,6 +7,7 @@ from .forms import CustomForm,DoctorProfileForm,SearchDoctorSpForm,PatientProfil
 from .models import Person, Patient, Doctor
 from django.db import connection
 from django.contrib import messages
+from datetime import datetime
 # Create your views here.
 
 def homeview(request):
@@ -130,11 +131,14 @@ def doctor_search_by_username(request):
     return render(request,'portal/searchdoctorbyusername.html',{'form':form})
 
 def profileeditdoctor(request):
+    user=request.user
+    cursor=connection.cursor()
+    cursor.execute('select * from portal_doctor where user_id=%s',[user.id])
+    doctor=cursor.fetchone()
     
     if(request.method=="GET"):
         form=DoctorProfileForm(request.GET)
         if(form.is_valid()):
-            user=request.user
             specialization=request.GET.get('specialization')
             name=request.GET.get('name')
             address=request.GET.get('address')
@@ -156,25 +160,28 @@ def profileeditdoctor(request):
             return redirect('homepage')
     else:
         form=DoctorProfileForm()
-    return render(request,"portal/editdoctorprofile.html",{'form':form})
+    return render(request,"portal/editdoctorprofile.html",{'form':form,'doctor':doctor})
 
 def profileeditpatient(request):
-    
+    user=request.user
+    cursor=connection.cursor()
+    cursor.execute('select * from portal_patient where user_id=%s',[user.id])
+    patient=cursor.fetchone()
     if(request.method=="GET"):
         form=PatientProfileForm(request.GET)
         if(form.is_valid()):
-            user=request.user
+            
             name=request.GET.get('name')
             address=request.GET.get('address')
             phone_number=request.GET.get('phone_number')
-            cursor=connection.cursor()
+            
             person=get_person_details(user.id)
             cursor.execute('update portal_patient set name= %s,address=%s,phone_number=%s where username=%s',[name,address,phone_number,user.username])
             print(person)
             return redirect('homepage')
     else:
         form=PatientProfileForm()
-    return render(request,"portal/editpatientprofile.html",{'form':form})
+    return render(request,"portal/editpatientprofile.html",{'form':form,'patient':patient})
 
 def get_person_details(username):
     cursor=connection.cursor()
@@ -210,6 +217,28 @@ def cancelAppointment(request):
         cursor.execute(s)
         s='update portal_freetimings set '+"t"+tme+"=0 where did_id=(select id from portal_doctor where username= '" + user.username + "')" 
         cursor.execute(s)
+        
+    else:
+        s="delete from portal_appointment where pid_id=(select id from portal_patient where username= '" + user.username + "') and did_id= (select id from portal_doctor where username= '" + uname + "') and time= '"+ tme + "'"
+        cursor.execute(s)
+        s='update portal_freetimings set '+"t"+tme+"=0 where did_id=(select id from portal_doctor where username= '" + uname + "')" 
+        cursor.execute(s)
+        
+    messages.info(request,f'Appointment cancelled')
+    return redirect('homepage')
+
+def doneappointment(request):
+    user=request.user
+    x=request.GET.get('id')
+    uname,tme=x.split('-')
+    cursor=connection.cursor()
+    cursor.execute('select * from portal_person WHERE user_id= %s',[user.id])
+    person=cursor.fetchone()
+    if(person[2]=='doctor'):
+        s="delete from portal_appointment where did_id=(select id from portal_doctor where username= '" + user.username + "') and pid_id= (select id from portal_patient where username= '" + uname + "') and time= '"+ tme + "'"
+        cursor.execute(s)
+        s='update portal_freetimings set '+"t"+tme+"=0 where did_id=(select id from portal_doctor where username= '" + user.username + "')" 
+        cursor.execute(s)
         s="insert into portal_appointmenthistory (did_id,pid_id,time) values ((select id from portal_doctor where username= '" + user.username + "'),(select id from portal_patient where username= '" + uname + "'), 't"+ tme + "')"
         cursor.execute(s)
     else:
@@ -219,10 +248,11 @@ def cancelAppointment(request):
         cursor.execute(s)
         s="insert into portal_appointmenthistory (did_id,pid_id,time) values ((select id from portal_doctor where username= '" + uname + "'),(select id from portal_patient where username= '" + user.username + "'), 't"+ tme + "')"
         cursor.execute(s)
-    messages.info(request,f'Appointment cancelled')
+    messages.info(request,f'Appointment completed')
     return redirect('homepage')
 
 def appointmenthistory(request):
+
     user=request.user
     cursor=connection.cursor()
     cursor.execute('select * from portal_person WHERE user_id= %s',[user.id])
@@ -233,3 +263,16 @@ def appointmenthistory(request):
         cursor.execute('select d.username,d.name,d.phone_number,d.address,a.time from portal_doctor d inner join portal_appointmenthistory a on d.id=a.did_id where pid_id= (select id from portal_patient where username=%s)',[person[1]])
     appointments=cursor.fetchall() 
     return render(request,'portal/appointmenthistory.html',{'appointments':appointments})
+
+def myaccount(request):
+    user=request.user
+    cursor=connection.cursor()
+    cursor.execute('select * from portal_person where user_id=%s',[user.id])
+    person=cursor.fetchone()
+    if(person[2]=="doctor"):
+        cursor.execute('select * from portal_doctor where user_id=%s',[user.id])
+    else:
+        cursor.execute('select * from portal_patient where user_id=%s',[user.id])
+    spperson=cursor.fetchone()
+
+    return render(request,'portal/myaccount.html',{'spperson':spperson,'person':person})

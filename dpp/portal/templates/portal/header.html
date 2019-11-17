@@ -1,32 +1,17 @@
+{% load static %}
 <!doctype html>
 <head>
-  {% load static %}
+  
   {% load index %}
-  <link rel="stylesheet" href="{% static 'portal/hw2.css' %}">
+  {% load placeholder %}
+  <link rel="stylesheet" type="text/css" href="{% static 'portal/css/hw2.css' %}">
   <title>DPP</title>
   <script type="text/javascript" src="{% static 'tinymce/js/prism.js' %}"></script>
     
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   
-   <style>
-   td{
-    font-size:30px;
-    text-align: center;
-   }
-  .editdoctor{
-	  text-align: center;
-	  font-size: 30px;
-  } 
-  .timing_checkbox{
-	font-size: 10px;
-}
-  .table_class{
-    border=2px;
-  }
-  </style> 
-  <script>
-    M.AutoInit();
-  </script>
+   
+  
   
 </head>
 <body>

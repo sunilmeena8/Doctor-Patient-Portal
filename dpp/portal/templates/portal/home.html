@@ -5,14 +5,14 @@
 	
 	{% if user.is_authenticated %}	  
     	{% if person.2 == "doctor" %}
-			
+			<Button><a href="/myaccount">My account</a></Button>
 			<Button><a href="/editprofiledoctor">EDIT PROFILE</a></Button>
 			<H3>Appoitments: </h3>
 			<table border=1 solid>
 			<tr>
 				<td>Sr. No.</td>
 				<td>Username</td>
-				<td>Doctor</td>
+				<td>Patient</td>
 				<td>Contact No.</td>
 				<td>Address</td>
 				<td>Time</td>
@@ -26,6 +26,7 @@
 					</td>
 				{% endfor %}
 				<td><a href="/cancelappointment/?id={{appointment.0}}-{{appointment.4}}" name="cncl">Cancel</a></td>
+				<td><a href="/doneappointment/?id={{appointment.0}}-{{appointment.4}}" name="done">Done</a></td>
 				</tr>
 			{% endfor %}
 			</table>
@@ -33,13 +34,14 @@
 		{% else %}
 			
 			<a href="/searchdoctor">Search for doctor</a>
+			<Button><a href="/myaccount">My account</a></Button>
 			<Button><a href="/editprofilepatient">EDIT PROFILE</a></Button>
 			<H3>Appoitments: </h3>
 			<table border=1 solid>
 			<tr>
 				<td>Sr. No.</td>
 				<td>Username</td>
-				<td>Patient</td>
+				<td>Doctor</td>
 				<td>Contact No.</td>
 				<td>Address</td>
 				<td>Time</td>

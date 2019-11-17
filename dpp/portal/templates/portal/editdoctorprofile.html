@@ -1,28 +1,28 @@
 {% extends "portal/header.html" %}
 {% block content %}
+  {% load placeholder %}
   <div class="editdoctor">
   <h1>Edit details: </h1>
   
   <form   method="GET">
     {% csrf_token %}
-    
-     <table  class="tableclass" style="align:center;margin-left:400px">
+     <table border=1 solid class="tableclass"  style="align:left;margin-left:400px">
       <tr style="text-align:left;">
         <td>Name:
         </td>
-        <td>{{form.name}}
+        <td style="text-align:left">{{form.name|placeholder:doctor.4 }}
         </td>
       </tr>
       <tr >
         <td style="text-align:left;padding-top:10px">Address:
         </td>
-        <td style="text-align:left">{{form.address}}
+        <td style="text-align:left">{{form.address|placeholder:doctor.5}}
         </td>
       </tr>
       <tr>
         <td style="text-align:left;padding-top:10px">Phone no.
         </td>
-        <td style="text-align:left">{{form.phone_number}}
+        <td style="text-align:left">{{form.phone_number|placeholder:doctor.6}}
         </td>
       </tr>
        <tr>
@@ -39,7 +39,7 @@
         </td>
         <td class="timing_checkbox">
           0-1 {{form.t0}}
-          1-2 {{form.t1}}
+          1-2 {{form.t1|placeholder:0}}
           2-3 {{form.t2}}
           3-4 {{form.t3}}
           4-5 {{form.t4}}
@@ -64,9 +64,15 @@
           23-24 {{form.t23}}
         </td>    
       </tr>
+      <tr>
+        <td>
+        </td>
+        <td style="text-align:center">
+        <button type="submit">Save</button>
+        </td>
+      </tr>
     </table>
-    <br>
-    <button type="submit">Save</button>
+    
   </form>
   </div>
 {% endblock %}

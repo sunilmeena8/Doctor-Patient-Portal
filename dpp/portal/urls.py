@@ -30,4 +30,6 @@ urlpatterns = [
     path('editprofilepatient/',views.profileeditpatient,name='editpatient'),
     path('cancelappointment/',views.cancelAppointment),
     path('appointmenthistory/',views.appointmenthistory),
+    path('doneappointment/',views.doneappointment),
+    path('myaccount/',views.myaccount),
 ]

@@ -1,5 +1,5 @@
 header{
-	background-image: url("flywheel.jpg");
+	background-image: url("dpp.jpg");
 	background-size: 1520px 1120px;
 	text-align: center;
 	font-size: 150%;
@@ -42,5 +42,21 @@ div{
   
 } 
 .editdoctor{
-	background: #0000ff;
+	background: #00ffff;
 }
+td{
+    font-size:30px;
+    text-align: center;
+   }
+  .editdoctor{
+	  text-align: center;
+	  font-size: 30px;
+  } 
+  .timing_checkbox{
+	font-size: 15px;
+
+}
+  .table_class{
+    border: 2px;
+  }
+  

@@ -1,0 +1,29 @@
+{% extends 'portal/header.html' %}
+{% block content %}
+	<h3>My Profile</h3>
+	{% if person.2 == "doctor" %}
+		<br>
+		Name : {{spperson.4}}
+		<br>
+		<br>
+		Phone No. : {{spperson.5}}
+		<br>
+		<br>
+		Address : {{spperson.6}}
+		<br>
+		<br>
+		<Button><a href="/editprofiledoctor">EDIT PROFILE</a></Button>
+	{% else %}
+		Name : {{spperson.3}}
+		<br>
+		<br>
+		Phone No. : {{spperson.4}}
+		<br>
+		<br>
+		Address : {{spperson.5}}
+		<br>
+		<br>
+		<Button><a href="/editprofilepatient">EDIT PROFILE</a></Button>
+	{% endif %}
+	
+{% endblock %}

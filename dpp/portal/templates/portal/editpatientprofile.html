@@ -1,33 +1,36 @@
 {% extends "portal/header.html" %}
 {% block content %}
+   {% load placeholder %}
   <div class="editdoctor">
   <h1>Edit details: </h1>
   
   <form   method="GET">
     {% csrf_token %}
     
-     <table  class="tableclass" style="align:center;margin-left:400px">
+     <table  border=1 solid class="tableclass" style="align:center;margin-left:400px">
       <tr style="text-align:left;">
         <td>Name:
         </td>
-        <td>{{form.name}}
+        <td>{{form.name|placeholder:patient.3 }}
         </td>
       </tr>
       <tr >
         <td style="text-align:left;padding-top:10px">Address:
         </td>
-        <td style="text-align:left">{{form.address}}
+        <td style="text-align:left">{{form.address|placeholder:patient.5}}
         </td>
       </tr>
       <tr>
         <td style="text-align:left;padding-top:10px">Phone no.
         </td>
-        <td style="text-align:left">{{form.phone_number}}
+        <td style="text-align:left">{{form.phone_number|placeholder:patient.4}}
         </td>
       </tr>
     <tr>
-		<button type="submit">Save</button>
-	</tr>	
+      <td>
+  		  <button type="submit">Save</button>
+      </td>
+  	</tr>	
     </table>
     <br>
     
