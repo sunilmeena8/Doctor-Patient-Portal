@@ -1,12 +1,13 @@
 {% extends "portal/header.html" %}
-
 {% block content %}
 	<div id="homeview">
 	{% if user.is_authenticated %}	  
     	{% if person.2 == "doctor" %}
+			
 			<Button><a href="/myaccount">My account</a></Button>
 			<Button><a href="/editprofiledoctor">EDIT PROFILE</a></Button>
-			<H3>Appoitments: </h3>
+			<Button> <a href="/appointmenthistory">Appointment History </a> </Button>
+			<H3 style="text-align:left">Appoitments: </h3>
 			<table border=1 solid>
 			<tr>
 				<td>Sr. No.</td>
@@ -29,12 +30,13 @@
 				</tr>
 			{% endfor %}
 			</table>
-			<Button> <a href="/appointmenthistory">Appointment History </a> </Button>
+			
 		{% else %}
 			
-			<a href="/searchdoctor">Search for doctor</a>
+			<Button><a href="/searchdoctor">Search for doctor</a></Button>
 			<Button><a href="/myaccount">My account</a></Button>
 			<Button><a href="/editprofilepatient">EDIT PROFILE</a></Button>
+			<Button> <a href="/appointmenthistory">Appointment History </a> </Button>
 			<H3>Appoitments: </h3>
 			<table border=1 solid>
 			<tr>
@@ -57,12 +59,12 @@
 				</tr>
 			{% endfor %}
 			</table>
-			<Button> <a href="/appointmenthistory">Appointment History </a> </Button>
+			
 		{% endif %}
 	{% else %}
 		<h4>Welcome to the Doctor Patient Portal</h4>
 		<p><a href="/login">LogIn</a> or <a href="/register">Register</a> to continue.</p> 
 	{% endif %}
 	</div>
-
+	
 {% endblock %}

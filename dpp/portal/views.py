@@ -113,7 +113,6 @@ def doctor_search_by_specialization(request):
             return render(request,'portal/selectdoctor.html',{'doctor_list':doctors,'range':range(24),'numdoctors':numdoctors})
     return render(request,'portal/searchdoctorbyspecialization.html',{'form':form})
     
-
 def doctor_search_by_username(request):
     if(request.method=="GET"):
         form=SearchDoctorUnForm(request.GET)

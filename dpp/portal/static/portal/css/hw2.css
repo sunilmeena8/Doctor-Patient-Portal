@@ -63,4 +63,16 @@ td{
   
 #homeview{
 	background: #00ffff;
+	text-align: left;
+}
+
+Button{
+	font-size: 16px;
+
+}
+a{
+	text-decoration: none;
+}
+#myaccount{
+	background: #00ffff;
 }

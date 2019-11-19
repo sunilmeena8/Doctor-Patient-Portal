@@ -1,5 +1,7 @@
 {% extends 'portal/header.html' %}
 {% block content %}
+	<table id="myaccount">
+	<tr>
 	<h3>My Profile</h3>
 	{% if person.2 == "doctor" %}
 		<br>
@@ -25,5 +27,6 @@
 		<br>
 		<Button><a href="/editprofilepatient">EDIT PROFILE</a></Button>
 	{% endif %}
-	
+	</tr>
+	</table>
 {% endblock %}
